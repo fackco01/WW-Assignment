@@ -1,5 +1,6 @@
 import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Role } from "./role.entity";
+import { IsString } from "class-validator";
 
 
 @Entity('users')
@@ -8,9 +9,11 @@ export class User {
   @PrimaryGeneratedColumn()
   userId: number;
 
+  @IsString()
   @Column({unique: true})
   username: string;
 
+  @IsString()
   @Column({nullable: false})
   password: string;
 
