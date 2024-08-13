@@ -6,6 +6,7 @@ import { jwtConstants } from "../constants";
 type JwtPayload = {
   sub: number;
   username: string;
+  roleId: number
 };
 
 @Injectable()

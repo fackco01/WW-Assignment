@@ -14,6 +14,8 @@ import { GetUserDto } from "./dto/get-all-user.dto";
 import { User } from "../auth/entities/user.entity";
 import { JwtAuthGuard } from "../guard/jwt-auth.guard";
 import { AuthGuard } from "../auth/auth.guard";
+import { Roles } from "./roles.decorator";
+import { RolesGuard } from "./role.guard";
 
 
 @Controller('user')
@@ -44,48 +46,26 @@ export class UserController {
     }
   }
 
-  //get By Id
-  // @Get(':id')
-  // async findUserId(
-  //   @Param('id') id: number,
-  // ): Promise<GetUserDto> {
-  //   try{
-  //     const user: User = await this.userService.findUserById(id);
-  //     const dto = new GetUserDto();
-  //     dto.userId = user.userId;
-  //     dto.username = user.username;
-  //     dto.name = user.name;
-  //     dto.password = user.password;
-  //     dto.roleId = user.roleId;
-  //     return dto;
-  //   }
-  //   catch (error) {
-  //     throw new NotFoundException(`Cannot find user: ${error}`);
-  //   }
-  // }
-
 //Get profile
   @UseGuards(JwtAuthGuard)
+  //@Roles(1) //Just test Role Authorization. Must have RoleGuard
+  //@UseGuards(AuthGuard, RolesGuard)
   @Get('profile')
   async findUserId(
-    @Res() res,
     @Req() req
   ) {
     try {
       const user: User = await this.userService.findUserById(req.user.sub);
 
       if (!user) {
-        return res.status(HttpStatus.NOT_FOUND).json({
-          message: 'User not found',
-        });
+        throw new NotFoundException(`Cannot find user: ${user}`);
       }
 
-      return res.status(HttpStatus.OK).json(user);
+      return user;
     } catch (error) {
       throw new NotFoundException(`Cannot find user: ${error.message}`);
     }
   }
-
 
 }
 

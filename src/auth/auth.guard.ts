@@ -6,51 +6,32 @@ import {
 } from "@nestjs/common";
 import { JwtService } from '@nestjs/jwt';
 import { AuthService } from "./auth.service";
+import { Observable } from "rxjs";
 
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(
-    private readonly authService: AuthService) {}
+    private readonly authService: AuthService,
+    private jwtService: JwtService) {}
 
-  async canActivate(context: ExecutionContext): Promise<boolean> {
+  canActivate(
+    context: ExecutionContext
+  ): boolean | Promise<boolean> | Observable<boolean> {
     try {
       const request = context.switchToHttp().getRequest();
-      //const token = this.extractTokenFromHeader(request);
-      const { authorization }: any = request.headers;
-      if (!authorization || authorization.trim() === '') {
-        throw new UnauthorizedException('Please provide token');
+      const token = request.headers.authorization.split(' ')[1];
+      console.log(token);
+
+      if (!token) {
+        throw new UnauthorizedException();
       }
-      const authToken = authorization.replace(/bearer/gim, '').trim();
-      const resp = await this.authService.validateToken(authToken);
-      request.decodedData = resp;
-      return true;
-    }
+      request.user = this.jwtService.verify(token);
+      console.log(request.user);
+      }
     catch (error) {
       console.log('auth error - ', error.message);
       throw new ForbiddenException(error.message || 'session expired! Please sign In');
     }
+    return true;
   }
-
-  //   if (!token) {
-  //
-  //     console.log('No token found');
-  //     throw new UnauthorizedException();
-  //   }
-  //   try {
-  //     const payload = await this.jwtService.verifyAsync(
-  //       token);
-  //     console.log(token);
-  //     request['user'] = payload;
-  //   } catch {
-  //     throw new UnauthorizedException();
-  //   }
-  //   return true;
-  // }
-  //
-  // private extractTokenFromHeader(request: Request): string | undefined {
-  //   const [type, token] = request.headers.authorization?.split(' ') ?? [];
-  //   return type === 'Bearer' ? token : undefined;
-  // }
-
-
 }
