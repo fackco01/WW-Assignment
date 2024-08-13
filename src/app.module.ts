@@ -7,6 +7,8 @@ import { User } from "./auth/entities/user.entity";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { UserModule } from './user/user.module';
 import configuration from "./config/configuration";
+import { JwtModule } from "@nestjs/jwt";
+import { jwtConstants } from "./constants";
 
 @Module({
   imports: [
@@ -15,6 +17,11 @@ import configuration from "./config/configuration";
       load: [configuration],
       envFilePath: '.env',
       }),
+    JwtModule.register({
+      global: true,
+      secret: jwtConstants.secret,
+      signOptions: { expiresIn: '60s' },
+    }),
 
     // TypeOrmModule.forRootAsync({
     //   useFactory: (configService: ConfigService) => ({

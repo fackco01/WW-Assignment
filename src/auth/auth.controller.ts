@@ -1,4 +1,17 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpStatus, HttpCode } from "@nestjs/common";
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  HttpStatus,
+  HttpCode,
+  UseGuards,
+  Request,
+  Req
+} from "@nestjs/common";
 import { AuthService } from './auth.service';
 import { RegisterDto } from "./dto/register.dto";
 import { LoginDto } from "./dto/login.dto";
@@ -18,6 +31,7 @@ export class AuthController {
     return await this.authService.login(loginData);
   }
 
+
   //Post: Register
   @Post('register')
   async register(
@@ -25,5 +39,4 @@ export class AuthController {
     return await this.authService.register(registerData);
   }
 
-  //POST: Refresh Token
 }

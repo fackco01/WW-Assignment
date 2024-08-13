@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Role } from "./role.entity";
 import { IsString } from "class-validator";
 
@@ -23,7 +23,7 @@ export class User {
   @Column({nullable: false})
   roleId: number;
 
-  @OneToOne(() => Role)
+  @ManyToOne(() => Role, role => role.users)
   @JoinColumn({ name: 'roleId' })
   role: Role;
 }

@@ -6,6 +6,8 @@ import { RegisterDto } from "./dto/register.dto";
 import * as bcrypt from "bcrypt";
 import { LoginDto } from "./dto/login.dto";
 import { JwtService } from "@nestjs/jwt";
+import { jwtConstants } from "../constants";
+import { AccessTokenStrategy } from "../guard/jwt-guard.strategy";
 
 
 @Injectable()
@@ -14,7 +16,8 @@ export class AuthService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-    private readonly jwtService: JwtService
+    private readonly jwtService: JwtService,
+    private readonly tokenStrategy: AccessTokenStrategy
   ) {
   }
 
@@ -50,15 +53,42 @@ export class AuthService {
       throw new UnauthorizedException('Password not match');
     }
 
-    const payload = {
-      sub: user.userId,
-      username: user.username,
-      name: user.name,
-      roleId: user.roleId
-    };
-
+    const payload = this.tokenStrategy.validate({ username: user.username, sub: user.userId });
     return {
-      token: this.jwtService.sign(payload)
+      token: this.jwtService.sign(payload, {
+        secret: 'deb1ccd5c313ff224118dee9b4dae9203d68213f3a5533c77a9ae71d85fdcd2f',
+        privateKey: 'deb1ccd5c313ff224118dee9b4dae9203d68213f3a5533c77a9ae71d85fdcd2f',
+      }),
     }
+  }
+
+  //test
+  async validateUser(username: string, pass: string): Promise<any> {
+    const user = await this.userRepository.findOneBy({ username: username });
+    if (user && user.password === pass) {
+      const { password, ...result } = user;
+      return result;
+    }
+    throw new UnauthorizedException('User not found');
+  }
+
+  async getAuthenticatedUser(username: string, pass: string): Promise<any> {
+    try {
+      const user = await this.userRepository.findOneBy({ username: username });
+      await this.userRepository.findOneBy({ password: pass });
+      if (user && user.password === pass) {
+        const { password, ...result } = user;
+        return result;
+      }
+    }
+    catch (error) {
+      throw new UnauthorizedException()
+    }
+  }
+
+  validateToken(token: string) {
+    return this.jwtService.verify(token, {
+      secret : jwtConstants.secret
+    });
   }
 }

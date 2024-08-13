@@ -1,41 +1,56 @@
 import {
   CanActivate,
-  ExecutionContext,
+  ExecutionContext, ForbiddenException,
   Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+  UnauthorizedException
+} from "@nestjs/common";
 import { JwtService } from '@nestjs/jwt';
-import { Request } from 'express';
-import { jwtConstants } from "../constants";
+import { AuthService } from "./auth.service";
 
 @Injectable()
 export class AuthGuard implements CanActivate {
-  constructor(private jwtService: JwtService) {}
+  constructor(
+    private readonly authService: AuthService) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const request = context.switchToHttp().getRequest();
-    const token = this.extractTokenFromHeader(request);
-    if (!token) {
-      throw new UnauthorizedException();
-    }
     try {
-      const payload = await this.jwtService.verifyAsync(
-        token,
-        {
-          secret: jwtConstants.secret
-        }
-      );
-      // 💡 We're assigning the payload to the request object here
-      // so that we can access it in our route handlers
-      request['user'] = payload;
-    } catch {
-      throw new UnauthorizedException();
+      const request = context.switchToHttp().getRequest();
+      //const token = this.extractTokenFromHeader(request);
+      const { authorization }: any = request.headers;
+      if (!authorization || authorization.trim() === '') {
+        throw new UnauthorizedException('Please provide token');
+      }
+      const authToken = authorization.replace(/bearer/gim, '').trim();
+      const resp = await this.authService.validateToken(authToken);
+      request.decodedData = resp;
+      return true;
     }
-    return true;
+    catch (error) {
+      console.log('auth error - ', error.message);
+      throw new ForbiddenException(error.message || 'session expired! Please sign In');
+    }
   }
 
-  private extractTokenFromHeader(request: Request): string | undefined {
-    const [type, token] = request.headers.authorization?.split(' ') ?? [];
-    return type === 'Bearer' ? token : undefined;
-  }
+  //   if (!token) {
+  //
+  //     console.log('No token found');
+  //     throw new UnauthorizedException();
+  //   }
+  //   try {
+  //     const payload = await this.jwtService.verifyAsync(
+  //       token);
+  //     console.log(token);
+  //     request['user'] = payload;
+  //   } catch {
+  //     throw new UnauthorizedException();
+  //   }
+  //   return true;
+  // }
+  //
+  // private extractTokenFromHeader(request: Request): string | undefined {
+  //   const [type, token] = request.headers.authorization?.split(' ') ?? [];
+  //   return type === 'Bearer' ? token : undefined;
+  // }
+
+
 }

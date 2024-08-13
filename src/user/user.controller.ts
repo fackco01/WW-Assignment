@@ -5,14 +5,16 @@ import {
   NotFoundException,
   Param,
   Query, UseGuards,
-  UseInterceptors
+  UseInterceptors,
+  Request,
+  Response, HttpStatus, Req, Res
 } from "@nestjs/common";
 import { UserService } from './user.service';
 import { GetUserDto } from "./dto/get-all-user.dto";
 import { User } from "../auth/entities/user.entity";
-import { Roles } from "./roles.decorator";
-import { RolesGuard } from "./role.guard";
+import { JwtAuthGuard } from "../guard/jwt-auth.guard";
 import { AuthGuard } from "../auth/auth.guard";
+
 
 @Controller('user')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -43,23 +45,47 @@ export class UserController {
   }
 
   //get By Id
-  @UseGuards(AuthGuard)
-  @Get(':id')
+  // @Get(':id')
+  // async findUserId(
+  //   @Param('id') id: number,
+  // ): Promise<GetUserDto> {
+  //   try{
+  //     const user: User = await this.userService.findUserById(id);
+  //     const dto = new GetUserDto();
+  //     dto.userId = user.userId;
+  //     dto.username = user.username;
+  //     dto.name = user.name;
+  //     dto.password = user.password;
+  //     dto.roleId = user.roleId;
+  //     return dto;
+  //   }
+  //   catch (error) {
+  //     throw new NotFoundException(`Cannot find user: ${error}`);
+  //   }
+  // }
+
+//Get profile
+  @UseGuards(JwtAuthGuard)
+  @Get('profile')
   async findUserId(
-    @Param('id') id: number
-  ): Promise<GetUserDto> {
-    try{
-      const user: User = await this.userService.findUserById(id);
-      const dto = new GetUserDto();
-      dto.userId = user.userId;
-      dto.username = user.username;
-      dto.name = user.name;
-      dto.password = user.password;
-      dto.roleId = user.roleId;
-      return dto;
-    }
-    catch (error) {
-      throw new NotFoundException(`Cannot find user: ${error}`);
+    @Res() res,
+    @Req() req
+  ) {
+    try {
+      const user: User = await this.userService.findUserById(req.user.sub);
+
+      if (!user) {
+        return res.status(HttpStatus.NOT_FOUND).json({
+          message: 'User not found',
+        });
+      }
+
+      return res.status(HttpStatus.OK).json(user);
+    } catch (error) {
+      throw new NotFoundException(`Cannot find user: ${error.message}`);
     }
   }
+
+
 }
+
