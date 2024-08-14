@@ -4,7 +4,7 @@ import { UserController } from './user.controller';
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { User } from "../auth/entities/user.entity";
 import { AuthModule } from "../auth/auth.module";
-import { AuthGuard } from "../auth/auth.guard";
+import { AuthGuard } from "../guard/auth.guard";
 
 
 @Module({

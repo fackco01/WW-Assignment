@@ -6,7 +6,7 @@ import { User } from "./entities/user.entity";
 import { JwtModule, JwtService } from "@nestjs/jwt";
 import { jwtConstants } from "../constants";
 import { PassportModule } from "@nestjs/passport";
-import { AuthGuard } from "./auth.guard";
+import { AuthGuard } from "../guard/auth.guard";
 import { AccessTokenStrategy } from "../guard/jwt-guard.strategy";
 
 @Module({

@@ -7,15 +7,17 @@ import {
   Query, UseGuards,
   UseInterceptors,
   Request,
-  Response, HttpStatus, Req, Res
+  Response, HttpStatus, Req, Res, Patch, Body, Delete
 } from "@nestjs/common";
 import { UserService } from './user.service';
 import { GetUserDto } from "./dto/get-all-user.dto";
 import { User } from "../auth/entities/user.entity";
 import { JwtAuthGuard } from "../guard/jwt-auth.guard";
-import { AuthGuard } from "../auth/auth.guard";
-import { Roles } from "./roles.decorator";
-import { RolesGuard } from "./role.guard";
+import { AuthGuard } from "../guard/auth.guard";
+import { Roles } from "../config/roles.decorator";
+import { RolesGuard } from "../guard/role.guard";
+import { UpdateUserDto } from "./dto/update-user.dto";
+import { CacheInterceptor } from "@nestjs/cache-manager";
 
 
 @Controller('user')
@@ -24,6 +26,7 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   //get All
+  @UseInterceptors(CacheInterceptor)
   @Get()
   async findAllUser(
     @Query() query: GetUserDto
@@ -67,5 +70,28 @@ export class UserController {
     }
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Patch('updateProfile')
+  async updateUser(
+    @Request() req,
+    @Body() updateUserDto: UpdateUserDto
+  ) {
+    const user = await this.userService.updateUser(req.user.sub, updateUserDto);
+    if(!user){
+      throw new NotFoundException(`Cannot find user: ${user}`);
+    }
+    else{
+      return user
+    }
+  }
+
+  @UseGuards(AuthGuard)
+  @Delete(':id')
+  async deleteUser(
+    @Param('id') id: number
+  ) {
+    await this.userService.deleteUser(id);
+    return { message: 'User deleted successfully' };
+  }
 }
 
