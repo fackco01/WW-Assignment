@@ -8,6 +8,7 @@ import { JwtModule } from "@nestjs/jwt";
 import { jwtConstants } from "./constants";
 import { dataSourceOptions } from "../db/dataSource-local";
 import { CacheModule } from "@nestjs/cache-manager";
+import {redisStore} from "cache-manager-redis-yet";
 
 @Module({
   imports: [
@@ -23,6 +24,8 @@ import { CacheModule } from "@nestjs/cache-manager";
     }),
     CacheModule.register({
       isGlobal: true,
+      //store: redisStore, //For Microservice.
+      //ttl:30 * 1000,
     }),
 
     TypeOrmModule.forRoot(dataSourceOptions),

@@ -1,7 +1,9 @@
 import { IsNotEmpty, IsString } from "class-validator";
-import { Exclude } from "class-transformer";
+import { Exclude, Transform } from "class-transformer";
 import { User } from "../../auth/entities/user.entity";
 import { ApiProperty } from "@nestjs/swagger";
+import { UserService } from "../user.service";
+import { Role } from "../../auth/entities/role.entity";
 
 
 export class GetUserDto {
@@ -16,7 +18,9 @@ export class GetUserDto {
   @Exclude()
   password: string;
 
+  @Exclude()
   roleId: number;
 
+  role: string;
 
   }
