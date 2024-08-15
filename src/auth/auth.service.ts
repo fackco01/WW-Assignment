@@ -8,6 +8,8 @@ import { LoginDto } from "./dto/login.dto";
 import { JwtService } from "@nestjs/jwt";
 import { jwtConstants } from "../constants";
 import { AccessTokenStrategy } from "../guard/jwt-guard.strategy";
+import { EventEmitter2, OnEvent } from "@nestjs/event-emitter";
+import { NewUserEvent } from "../events/new-user.event";
 
 
 @Injectable()
@@ -17,7 +19,8 @@ export class AuthService {
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
     private readonly jwtService: JwtService,
-    private readonly tokenStrategy: AccessTokenStrategy
+    private readonly tokenStrategy: AccessTokenStrategy,
+    private readonly eventEmitter: EventEmitter2
   ) {
   }
 
@@ -37,7 +40,18 @@ export class AuthService {
     user.password = hashPassword;
     user.name = registerData.name;
     user.roleId = registerData.roleId;
-    return await this.userRepository.save(user);
+    const userData = await this.userRepository.save(user);
+
+    //Event Emitter
+    this.eventEmitter.emit(
+      'user.registered',
+      new NewUserEvent(
+        userData.username,
+        userData.name,
+        userData.roleId
+        ));
+
+    return userData;
   }
 
   //Login
@@ -53,42 +67,18 @@ export class AuthService {
       throw new UnauthorizedException('Password not match');
     }
 
-    const payload = this.tokenStrategy.validate({ username: user.username, sub: user.userId, roleId: user.roleId });
+    const payload = this.tokenStrategy.validate({
+      username: user.username,
+      sub: user.userId,
+      roleId: user.roleId });
+
     return {
       token: this.jwtService.sign(payload, {
         secret: 'deb1ccd5c313ff224118dee9b4dae9203d68213f3a5533c77a9ae71d85fdcd2f',
         privateKey: 'deb1ccd5c313ff224118dee9b4dae9203d68213f3a5533c77a9ae71d85fdcd2f',
       }),
-    }
-  }
 
-  //test
-  async validateUser(username: string, pass: string): Promise<any> {
-    const user = await this.userRepository.findOneBy({ username: username });
-    if (user && user.password === pass) {
-      const { password, ...result } = user;
-      return result;
+      message: `Welcome Back User: ${user.username}`,
     }
-    throw new UnauthorizedException('User not found');
-  }
-
-  async getAuthenticatedUser(username: string, pass: string): Promise<any> {
-    try {
-      const user = await this.userRepository.findOneBy({ username: username });
-      await this.userRepository.findOneBy({ password: pass });
-      if (user && user.password === pass) {
-        const { password, ...result } = user;
-        return result;
-      }
-    }
-    catch (error) {
-      throw new UnauthorizedException()
-    }
-  }
-
-  validateToken(token: string) {
-    return this.jwtService.verify(token, {
-      secret : jwtConstants.secret
-    });
   }
 }

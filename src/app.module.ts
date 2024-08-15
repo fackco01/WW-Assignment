@@ -9,6 +9,9 @@ import { jwtConstants } from "./constants";
 import { dataSourceOptions } from "../db/dataSource-local";
 import { CacheModule } from "@nestjs/cache-manager";
 import {redisStore} from "cache-manager-redis-yet";
+import { EventEmitterModule } from "@nestjs/event-emitter";
+import { NotificationsModule } from './notifications/notifications.module';
+import { UploadModule } from './upload/upload.module';
 
 @Module({
   imports: [
@@ -27,10 +30,13 @@ import {redisStore} from "cache-manager-redis-yet";
       //store: redisStore, //For Microservice.
       //ttl:30 * 1000,
     }),
+    EventEmitterModule.forRoot(),
 
     TypeOrmModule.forRoot(dataSourceOptions),
     AuthModule,
     UserModule,
+    NotificationsModule,
+    UploadModule,
   ],
   controllers: [],
   providers: [],

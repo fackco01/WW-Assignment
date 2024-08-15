@@ -6,6 +6,8 @@ import { UpdateUserDto } from "./dto/update-user.dto";
 import { Cache } from "cache-manager";
 import * as bcrypt from "bcrypt";
 import { Role } from "../auth/entities/role.entity";
+import { EventEmitter2 } from "@nestjs/event-emitter";
+import { SchedulerRegistry } from "@nestjs/schedule";
 
 @Injectable()
 export class UserService {
@@ -17,7 +19,9 @@ export class UserService {
     @InjectRepository(Role)
     private readonly roleRepository: Repository<Role>,
 
-    @Inject('CACHE_MANAGER') private cacheManager: Cache
+    @Inject('CACHE_MANAGER') private cacheManager: Cache,
+    private readonly eventEmitter: EventEmitter2,
+    private schedulerRegistry: SchedulerRegistry,
   ) {}
 
   async findAllUser(): Promise<User[]> {

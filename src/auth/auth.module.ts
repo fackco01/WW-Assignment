@@ -8,6 +8,8 @@ import { jwtConstants } from "../constants";
 import { PassportModule } from "@nestjs/passport";
 import { AuthGuard } from "../guard/auth.guard";
 import { AccessTokenStrategy } from "../guard/jwt-guard.strategy";
+import { EventEmitter2 } from "@nestjs/event-emitter";
+import { NotificationsService } from "../notifications/notifications.service";
 
 @Module({
   imports: [
@@ -20,7 +22,7 @@ import { AccessTokenStrategy } from "../guard/jwt-guard.strategy";
     PassportModule,
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtService,AccessTokenStrategy],
-  exports: [AuthService, JwtService,AccessTokenStrategy],
+  providers: [AuthService, JwtService,AccessTokenStrategy, EventEmitter2, String, NotificationsService],
+  exports: [AuthService, JwtService,AccessTokenStrategy, EventEmitter2, String, NotificationsService],
 })
 export class AuthModule {}
