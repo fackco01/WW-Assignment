@@ -1,7 +1,8 @@
 import { Exclude } from 'class-transformer';
-import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {BaseEntity, Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn} from 'typeorm';
+import {Role} from "./role.entity";
 
-@Entity()
+@Entity('auths')
 export class Auth extends BaseEntity {
     @PrimaryGeneratedColumn()
     public id!: number;
@@ -12,4 +13,14 @@ export class Auth extends BaseEntity {
     @Exclude()
     @Column({ type: 'varchar' })
     public password!: string;
+
+    @Column({ type: 'varchar' })
+    public name!: string;
+
+    @Column({ type: 'integer' })
+    public roleId!: number;
+
+    @ManyToOne(() => Role, role => role.auths)
+    @JoinColumn({ name: 'roleId' })
+    public role!: Role;
 }

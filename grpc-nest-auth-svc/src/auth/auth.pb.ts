@@ -13,6 +13,8 @@ export const protobufPackage = "auth";
 export interface RegisterRequest {
   username: string;
   password: string;
+  name: string;
+  roleId: number;
 }
 
 export interface RegisterResponse {

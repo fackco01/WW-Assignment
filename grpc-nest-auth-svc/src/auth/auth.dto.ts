@@ -16,6 +16,12 @@ export class RegisterRequestDto implements RegisterRequest {
     @IsString()
     @MinLength(8)
     public readonly password: string;
+
+    @IsString()
+    public readonly name: string;
+
+    @IsString()
+    public readonly roleId: number;
 }
 
 export class ValidateRequestDto implements ValidateRequest {
