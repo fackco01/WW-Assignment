@@ -53,8 +53,6 @@ message UpdatePostResponse {
 
 
 message GetAllPostsRequest {
-  int32 page = 1;
-  int32 limit = 2;
 }
 
 message GetAllPostsResponse {

@@ -19,6 +19,7 @@ async function bootstrap() {
   app.useGlobalFilters(new HttpExceptionFilter());
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
   await app.listen();
+  console.log('gRPC Server is running on: 0.0.0.0:50051');
 }
 
 bootstrap();

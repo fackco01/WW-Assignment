@@ -49,8 +49,6 @@ message UpdateUserResponse {
 
 // GetAllUsers
 message GetAllUsersRequest {
-  int32 page = 1;
-  int32 limit = 2;
 }
 
 message GetAllUsersResponse {
