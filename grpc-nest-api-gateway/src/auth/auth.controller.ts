@@ -19,7 +19,7 @@ export class AuthController implements OnModuleInit {
         return this.svc.register(body);
     }
 
-    @Put('login')
+    @Post('login')
     private async login(@Body() body: LoginRequest): Promise<Observable<LoginResponse>> {
         return this.svc.login(body);
     }
