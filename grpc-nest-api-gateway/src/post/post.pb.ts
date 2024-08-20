@@ -45,8 +45,6 @@ export interface UpdatePostResponse {
 }
 
 export interface GetAllPostsRequest {
-  page: number;
-  limit: number;
 }
 
 export interface GetAllPostsResponse {

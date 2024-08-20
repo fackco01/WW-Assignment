@@ -48,8 +48,6 @@ export interface UpdateUserResponse {
 
 /** GetAllUsers */
 export interface GetAllUsersRequest {
-  page: number;
-  limit: number;
 }
 
 export interface GetAllUsersResponse {
