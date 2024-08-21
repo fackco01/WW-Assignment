@@ -1,24 +1,38 @@
-import {HttpStatus, Inject, Injectable} from "@nestjs/common";
-import {InjectRepository} from "@nestjs/typeorm";
-import {Auth} from "../auth.entity";
+import { HttpStatus, Inject, Injectable, OnModuleInit } from "@nestjs/common";
+import { ClientGrpc } from "@nestjs/microservices";
+import { InjectRepository } from "@nestjs/typeorm";
+import { USER_SERVICE_NAME, UserServiceClient } from "src/user/user.pb";
 import { Repository } from "typeorm";
-import {JwtService} from "./jwt.service";
-import {RegisterRequestDto} from "../auth.dto";
-import {LoginRequest, LoginResponse, RegisterResponse, ValidateRequest, ValidateResponse} from "../auth.pb";
+import { RegisterRequestDto } from "../auth.dto";
+import { Auth } from "../auth.entity";
+import { LoginRequest, LoginResponse, RegisterResponse, ValidateRequest, ValidateResponse } from "../auth.pb";
+import { JwtService } from "./jwt.service";
+import { firstValueFrom } from "rxjs";
 
 @Injectable()
-export class AuthService{
+export class AuthService implements OnModuleInit{
+    @Inject(USER_SERVICE_NAME)
+    private readonly userClient: ClientGrpc;
+    private userService: UserServiceClient;
     @InjectRepository(Auth)
     private readonly repository: Repository<Auth>;
 
     @Inject(JwtService)
     private readonly jwtService: JwtService;
 
+    onModuleInit() {
+        this.userService = this.userClient.getService<UserServiceClient>(USER_SERVICE_NAME);
+    }
+
     public async register(registerData : RegisterRequestDto) : Promise<RegisterResponse> {
         let auth: Auth = await this.repository.findOneBy({username: registerData.username});
 
         if (auth) {
-            throw new Error("User already exists");
+            return {
+                status: HttpStatus.CONFLICT,
+                error: ['User already exists'],
+                id: null
+            };
         }
 
         auth = new Auth();
@@ -29,9 +43,27 @@ export class AuthService{
 
         await this.repository.save(auth);
 
+        const createUserResponse = await firstValueFrom(this.userService.createUser({
+            id: auth.id,
+            username: auth.username,
+            password: auth.password,
+            fullName: auth.name,
+            roleId: auth.roleId,
+        }));
+
+        if (createUserResponse.status !== 201) {
+            await this.repository.remove(auth);
+            return {
+                status: HttpStatus.INTERNAL_SERVER_ERROR,
+                error: createUserResponse.error,
+                id: null
+            };
+        }
+
         return {
             status: HttpStatus.CREATED,
-            error: ['User already exists']
+            error: ['User already exists'],
+            id: auth.id
         }
     }
 

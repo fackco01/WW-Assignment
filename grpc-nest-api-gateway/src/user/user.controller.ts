@@ -1,7 +1,7 @@
-import { Body, Controller, Delete, Get, HttpException, HttpStatus, Inject, OnModuleInit, Param, Patch, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpException, HttpStatus, Inject, OnModuleInit, Param, Patch, Post, Put, Req } from '@nestjs/common';
 import { ClientGrpc } from '@nestjs/microservices';
 import { Observable } from 'rxjs';
-import { ChangePasswordRequest, ChangePasswordResponse, CreateUserRequest, CreateUserResponse, DeleteUserRequest, DeleteUserResponse, GetAllUsersResponse, GetUserDetailRequest, GetUserDetailResponse, UpdateUserRequest, UpdateUserResponse, USER_SERVICE_NAME, UserServiceClient } from './user.pb';
+import { ChangePasswordRequest, ChangePasswordResponse, CreateUserRequest, CreateUserResponse, DeleteUserRequest, DeleteUserResponse, GetAllUsersRequest, GetAllUsersResonse, GetUserDetailRequest, GetUserDetailResponse, UpdateUserRequest, UpdateUserResponse, USER_SERVICE_NAME, UserServiceClient } from './user.pb';
 
 @Controller('user')
 export class UserController implements OnModuleInit {
@@ -41,14 +41,13 @@ export class UserController implements OnModuleInit {
     }
 
     @Get()
-    async getAllUsers(): Promise<Observable<GetAllUsersResponse>>{
-        try {
-            const response = await this.svc.getAllUsers({});
-            return response;
-        }
-        catch (error) {
-            throw new HttpException('Failed to fetch users', HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    async getAllUsers(@Req () request: GetAllUsersRequest): Promise<Observable<GetAllUsersResonse>> {
+      try {
+        const response = await this.svc.getAllUsers(request);
+        return response;
+      } catch (error) {
+        throw new HttpException('Failed to fetch users', HttpStatus.INTERNAL_SERVER_ERROR);
+      }
     }
 
     @Get(':id')
@@ -77,11 +76,11 @@ export class UserController implements OnModuleInit {
 
     @Patch(':id/changePassword')
     async changePassword(
-        @Param('id') userId: number,
+        @Param('id') id: number,
         @Body() changePasswordRequest: ChangePasswordRequest
     ): Promise<Observable<ChangePasswordResponse>> {
         try {
-            const request : ChangePasswordRequest = {userId, ...changePasswordRequest};
+            const request : ChangePasswordRequest = {id, ...changePasswordRequest};
             const response = await this.svc.changePassword(request);
             return response;
         }
