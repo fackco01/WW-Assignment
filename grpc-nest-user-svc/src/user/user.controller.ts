@@ -1,8 +1,8 @@
 import { Body, Controller, Inject } from '@nestjs/common';
 import { GrpcMethod } from "@nestjs/microservices";
 import { Observable, of } from 'rxjs';
-import { CreateUserRequestDto } from './user.dto';
-import { CreateUserResponse, GetAllUsersRequest, GetAllUsersResonse, GetUserDetailRequest, GetUserDetailResponse, USER_SERVICE_NAME } from './user.pb';
+import { CreateUserRequestDto, GetUserDetailRequestDto, UpdateUserRequestDto } from './user.dto';
+import { CreateUserResponse, GetAllUsersRequest, GetAllUsersResonse, GetUserDetailResponse, UpdateUserRequest, UpdateUserResponse, USER_SERVICE_NAME } from './user.pb';
 import { UserService } from "./user.service";
 
 @Controller('user')
@@ -27,12 +27,20 @@ export class UserController {
     }
 
     @GrpcMethod(USER_SERVICE_NAME, 'GetUserDetail')
-    private async getUserDetail(data: GetUserDetailRequest): Promise<Observable<GetUserDetailResponse>> {
+    private async getUserDetail(data: GetUserDetailRequestDto): Promise<Observable<GetUserDetailResponse>> {
         const userData = await this.userService.getUserDetail(data);
         const response: GetUserDetailResponse = {
             user: userData.user
         }
+        return of(response);
+    }
 
+    @GrpcMethod(USER_SERVICE_NAME, 'UpdateUser')
+    private async updateUser(
+        @Body() data: UpdateUserRequest
+    ): Promise<Observable<UpdateUserResponse>> {
+        const { id, ...updateData } = data;
+        const response = await this.userService.updateUser(id, updateData);
         return of(response);
     }
 }

@@ -1,7 +1,23 @@
-import { Body, Controller, Delete, Get, HttpException, HttpStatus, Inject, OnModuleInit, Param, Patch, Post, Put, Req } from '@nestjs/common';
+import {
+    Body,
+    Controller,
+    Delete,
+    Get,
+    HttpException,
+    HttpStatus,
+    Inject,
+    OnModuleInit,
+    Param,
+    Patch,
+    Post,
+    Put,
+    Req,
+    UseGuards
+} from '@nestjs/common';
 import { ClientGrpc } from '@nestjs/microservices';
 import { Observable } from 'rxjs';
 import { ChangePasswordRequest, ChangePasswordResponse, CreateUserRequest, CreateUserResponse, DeleteUserRequest, DeleteUserResponse, GetAllUsersRequest, GetAllUsersResonse, GetUserDetailRequest, GetUserDetailResponse, UpdateUserRequest, UpdateUserResponse, USER_SERVICE_NAME, UserServiceClient } from './user.pb';
+import {AuthGuard} from "../auth/auth.guard";
 
 @Controller('user')
 export class UserController implements OnModuleInit {
@@ -25,14 +41,21 @@ export class UserController implements OnModuleInit {
         }
     }
 
-    @Put(':id')
+    @Patch('/update')
+    @UseGuards(AuthGuard)
     async updateUser(
-        @Param('id') id: number,
-        @Body() updateUserRequest: UpdateUserRequest
+        @Req() req,
+        @Body() updateUserRequest: Omit<UpdateUserRequest, 'id'>
     ): Promise<Observable<UpdateUserResponse>> {
         try {
-            updateUserRequest.id = id;
-            const response = await this.svc.updateUser(updateUserRequest);
+            const userId = req.user.id;
+            const fullRequest: UpdateUserRequest = {
+                id: userId,
+                ...updateUserRequest
+            };
+
+            const response = await this.svc.updateUser(fullRequest);
+            
             return response;
         }
         catch (error) {
@@ -50,10 +73,15 @@ export class UserController implements OnModuleInit {
       }
     }
 
-    @Get(':id')
-    async getUserDetail(@Param('id') id: number): Promise<Observable<GetUserDetailResponse>> {
+    @Get('/profile')
+    @UseGuards(AuthGuard)
+    async getUserDetail(
+        @Req () req
+    ): Promise<Observable<GetUserDetailResponse>> {
         try {
-            const request: GetUserDetailRequest = {id: id};
+            const userId = req.user.id;
+
+            const request: GetUserDetailRequest = {id: userId};
             const response = await this.svc.getUserDetail(request);
             return response;
         }

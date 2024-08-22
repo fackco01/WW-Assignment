@@ -62,7 +62,7 @@ export class AuthService implements OnModuleInit{
 
         return {
             status: HttpStatus.CREATED,
-            error: ['User already exists'],
+            error: null,
             id: auth.id
         }
     }

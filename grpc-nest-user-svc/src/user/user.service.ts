@@ -4,7 +4,7 @@ import { ClientGrpc } from "@nestjs/microservices";
 import { InjectRepository } from "@nestjs/typeorm";
 import { AUTH_SERVICE_NAME, AuthServiceClient } from "src/auth/auth.pb";
 import { Repository } from 'typeorm';
-import { CreateUserRequestDto, GetAllUsersDto, GetUserDetailDto, GetUserDetailRequestDto, UpdateUserRequestDto, UserDto } from "./user.dto";
+import { CreateUserRequestDto, GetAllUsersDto, GetUserDetailDto, GetUserDetailRequestDto, UpdateUserDto, UpdateUserRequestDto, UserDto } from "./user.dto";
 import { User } from "./user.entity";
 import { CreateUserResponse, DeleteUserResponse, GetUserDetailResponse, UpdateUserResponse } from "./user.pb";
 
@@ -84,22 +84,30 @@ export class UserService implements OnModuleInit {
         }
     }
 
-    public async updateUser(userData: UpdateUserRequestDto): Promise<UpdateUserResponse> {
-        const user = await this.repository.findOne({ where: { username: userData.username } });
-        if (!user) {
+    public async updateUser(id: number, data: UpdateUserRequestDto): Promise<UpdateUserResponse> {
+        const userExists = await this.repository.findOne({ where: { id: id } });
+        if (!userExists) {
             return {
                 message: "User not found"
             };
         }
+        try{
+            await this.repository.update(id, data);
+            //const updatedUser = await this.repository.findOne({ where: { id: id } });
+            // const outputDto = plainToClass(UpdateUserDto, updatedUser, {
+            //     excludeExtraneousValues: true
+            // })
 
-        const updateFields: Partial<User> = {};
-        if (userData.fullName) updateFields.fullName = userData.fullName;
-        if (userData.username) updateFields.username = userData.username;
-
-        Object.assign(user, updateFields);
-        await this.repository.save(user);
-        return {
-            message: "User updated successfully"
+            //console.log(outputDto);
+            
+            return {
+                message: "User updated successfully"
+            };
+        }
+        catch(error){
+            return {
+                message: error.message
+            };
         }
     }
 

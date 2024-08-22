@@ -37,8 +37,8 @@ export interface CreateUserResponse {
 /** UpdateUser */
 export interface UpdateUserRequest {
   id: number;
-  username: string;
   fullName: string;
+  roleId: number;
 }
 
 export interface UpdateUserResponse {

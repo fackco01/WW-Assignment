@@ -1,6 +1,6 @@
 
 import { Exclude, Expose } from "class-transformer";
-import { IsNotEmpty, IsString } from "class-validator";
+import { IsInt, IsNotEmpty, IsOptional, IsString } from "class-validator";
 import {
     CreateUserRequest,
     GetUserDetailRequest,
@@ -27,17 +27,15 @@ export class CreateUserRequestDto implements CreateUserRequest {
     public readonly roleId: number;
 }
 
-export class UpdateUserRequestDto implements UpdateUserRequest {
-
-    @IsNotEmpty()
-    public readonly id: number;
-
+export class UpdateUserRequestDto implements Partial<Omit<UpdateUserRequest, 'id'>> {
+    @IsOptional()
     @IsString()
     @IsNotEmpty()
-    public readonly username: string;
+    fullName?: string;
 
-    @IsString()
-    public readonly fullName: string;
+    @IsOptional()
+    @IsInt()
+    roleId?: number;
 }
 
 export class GetUserDetailRequestDto implements GetUserDetailRequest {
@@ -110,4 +108,18 @@ export class GetAllUsersDto {
     public readonly updatedAt: string;
     @Expose()
     public readonly roleId: number;
+}
+
+//Update User
+export class UpdateUserDto {
+    @Expose()
+    public readonly fullName: string;
+    @Expose()
+    public readonly createdAt: string;
+    @Expose()
+    public readonly updatedAt: string;
+
+    constructor(partial: Partial<UserDto>) {
+        Object.assign(this, partial);
+    }
 }
