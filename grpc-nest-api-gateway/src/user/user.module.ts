@@ -10,7 +10,7 @@ import { USER_PACKAGE_NAME, USER_SERVICE_NAME } from './user.pb';
       name: USER_SERVICE_NAME,
       transport: Transport.GRPC,
       options: {
-        url: 'localhost:50051',
+        url: 'localhost:50052',
         package: USER_PACKAGE_NAME,
         protoPath: resolve(__dirname, '../../../grpc-nest-proto/proto/user.proto'),
       },

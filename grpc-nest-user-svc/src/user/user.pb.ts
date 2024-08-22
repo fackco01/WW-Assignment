@@ -13,48 +13,44 @@ export const protobufPackage = "user";
 export interface User {
   id: number;
   username: string;
-  email: string;
   fullName: string;
-  createdAt: number;
-  updatedAt: number;
+  createdAt: string;
+  updatedAt: string;
+  roleId: number;
 }
 
 /** CreateUser */
 export interface CreateUserRequest {
+  id: number;
   username: string;
-  email: string;
   password: string;
   fullName: string;
+  roleId: number;
 }
 
 export interface CreateUserResponse {
+  status: number;
+  error: string[];
   id: number;
-  message: string;
-  user: User | undefined;
 }
 
 /** UpdateUser */
 export interface UpdateUserRequest {
   id: number;
-  username: string;
-  email: string;
   fullName: string;
+  roleId: number;
 }
 
 export interface UpdateUserResponse {
   message: string;
-  user: User | undefined;
 }
 
 /** GetAllUsers */
 export interface GetAllUsersRequest {
-  page: number;
-  limit: number;
 }
 
-export interface GetAllUsersResponse {
+export interface GetAllUsersResonse {
   users: User[];
-  total: number;
 }
 
 /** GetUserDetail */
@@ -77,7 +73,7 @@ export interface DeleteUserResponse {
 
 /** ChangePassword */
 export interface ChangePasswordRequest {
-  userId: number;
+  id: number;
   currentPassword: string;
   newPassword: string;
 }
@@ -93,7 +89,7 @@ export interface UserServiceClient {
 
   updateUser(request: UpdateUserRequest): Observable<UpdateUserResponse>;
 
-  getAllUsers(request: GetAllUsersRequest): Observable<GetAllUsersResponse>;
+  getAllUsers(request: GetAllUsersRequest): Observable<GetAllUsersResonse>;
 
   getUserDetail(request: GetUserDetailRequest): Observable<GetUserDetailResponse>;
 
@@ -113,7 +109,7 @@ export interface UserServiceController {
 
   getAllUsers(
     request: GetAllUsersRequest,
-  ): Promise<GetAllUsersResponse> | Observable<GetAllUsersResponse> | GetAllUsersResponse;
+  ): Promise<GetAllUsersResonse> | Observable<GetAllUsersResonse> | GetAllUsersResonse;
 
   getUserDetail(
     request: GetUserDetailRequest,

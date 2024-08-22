@@ -20,6 +20,7 @@ export interface RegisterRequest {
 export interface RegisterResponse {
   status: number;
   error: string[];
+  id: number;
 }
 
 export interface LoginRequest {

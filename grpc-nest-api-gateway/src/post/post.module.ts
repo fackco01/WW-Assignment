@@ -10,7 +10,7 @@ import { POST_PACKAGE_NAME, POST_SERVICE_NAME } from './post.pb';
       name: POST_SERVICE_NAME,
       transport: Transport.GRPC,
       options: {
-        url: 'localhost:50051',
+        url: 'localhost:50053',
         package: POST_PACKAGE_NAME,
         protoPath: resolve(__dirname, '../../../grpc-nest-proto/proto/post.proto'),
       }

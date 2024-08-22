@@ -38,7 +38,7 @@ export interface CreateUserResponse {
 export interface UpdateUserRequest {
   id: number;
   fullName: string;
-  roleId: number;
+  updatedAt: string;
 }
 
 export interface UpdateUserResponse {
