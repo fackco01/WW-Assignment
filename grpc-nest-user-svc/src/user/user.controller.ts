@@ -1,9 +1,10 @@
 import { Body, Controller, Inject } from '@nestjs/common';
-import { GrpcMethod } from "@nestjs/microservices";
+import { ClientGrpc, GrpcMethod } from "@nestjs/microservices";
 import { Observable, of } from 'rxjs';
 import { CreateUserRequestDto, GetUserDetailRequestDto, UpdateUserRequestDto } from './user.dto';
-import { CreateUserResponse, GetAllUsersRequest, GetAllUsersResonse, GetUserDetailResponse, UpdateUserRequest, UpdateUserResponse, USER_SERVICE_NAME } from './user.pb';
+import { CreateUserResponse, DeleteUserRequest, GetAllUsersRequest, GetAllUsersResonse, GetUserDetailResponse, UpdateUserRequest, UpdateUserResponse, USER_SERVICE_NAME } from './user.pb';
 import { UserService } from "./user.service";
+import { AUTH_SERVICE_NAME, AuthServiceClient } from 'src/auth/auth.pb';
 
 @Controller('user')
 export class UserController {
@@ -41,6 +42,14 @@ export class UserController {
     ): Promise<Observable<UpdateUserResponse>> {
         const { id, ...updateData } = data;
         const response = await this.userService.updateUser(id, updateData);
+        return of(response);
+    }
+
+    @GrpcMethod(USER_SERVICE_NAME, 'DeleteUser')
+    private async deleteUser(
+        @Body() data: DeleteUserRequest
+    ): Promise<Observable<UpdateUserResponse>> {
+        const response = await this.userService.deleteUser(data);
         return of(response);
     }
 }

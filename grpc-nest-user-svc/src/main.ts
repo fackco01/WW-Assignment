@@ -1,7 +1,7 @@
 import { INestMicroservice, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import {MicroserviceOptions, Transport} from '@nestjs/microservices';
-import { join } from 'path';
+import {join, resolve} from 'path';
 import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './user/filter/http-exception.filter';
 import { protobufPackage } from './user/user.pb';
@@ -12,7 +12,7 @@ async function bootstrap() {
     options: {
       url: '0.0.0.0:50052',
       package: protobufPackage,
-      protoPath: join('D:\\FPT\\MyCV\\NestJS\\WW-Microservice\\WW-Assignment\\grpc-nest-proto\\proto\\user.proto'),
+      protoPath: join('node_modules/grpc-nest-proto/proto/user.proto'),
     },
   });
 

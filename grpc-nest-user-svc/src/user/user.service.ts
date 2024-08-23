@@ -2,9 +2,10 @@ import { plainToClass } from "@nestjs/class-transformer";
 import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { ClientGrpc } from "@nestjs/microservices";
 import { InjectRepository } from "@nestjs/typeorm";
-import { AUTH_SERVICE_NAME, AuthServiceClient } from "src/auth/auth.pb";
+import { firstValueFrom } from "rxjs";
+import { AUTH_SERVICE_NAME, AuthServiceClient, DeleteRequest, DeleteResponse } from "src/auth/auth.pb";
 import { Repository } from 'typeorm';
-import { CreateUserRequestDto, GetAllUsersDto, GetUserDetailDto, GetUserDetailRequestDto, UpdateUserDto, UpdateUserRequestDto, UserDto } from "./user.dto";
+import { CreateUserRequestDto, GetAllUsersDto, GetUserDetailDto, GetUserDetailRequestDto, UpdateUserRequestDto, UserDto } from "./user.dto";
 import { User } from "./user.entity";
 import { CreateUserResponse, DeleteUserResponse, GetUserDetailResponse, UpdateUserResponse } from "./user.pb";
 
@@ -91,7 +92,7 @@ export class UserService implements OnModuleInit {
                 message: "User not found"
             };
         }
-        try{
+        try {
             await this.repository.update(id, data);
             //const updatedUser = await this.repository.findOne({ where: { id: id } });
             // const outputDto = plainToClass(UpdateUserDto, updatedUser, {
@@ -99,12 +100,12 @@ export class UserService implements OnModuleInit {
             // })
 
             //console.log(outputDto);
-            
+
             return {
                 message: "User updated successfully"
             };
         }
-        catch(error){
+        catch (error) {
             return {
                 message: error.message
             };
@@ -112,15 +113,33 @@ export class UserService implements OnModuleInit {
     }
 
     public async deleteUser(userData: GetUserDetailRequestDto): Promise<DeleteUserResponse> {
-        const user = await this.repository.findOne({ where: { id: userData.id } });
-        if (!user) {
+        let userExists = await this.repository.findOne({ where: { id: userData.id } });
+        if (!userExists) {
             return {
                 message: "User not found"
             };
         }
-        await this.repository.delete(userData.id);
-        return {
-            message: "User deleted successfully"
+
+        try{
+            const deleteRequest : DeleteRequest = {id: userData.id};
+            const deleteAuthResponse : DeleteResponse = await firstValueFrom(this.authService.delete(deleteRequest));
+
+            if(deleteAuthResponse.status === 200){
+                await this.repository.delete(userData.id);
+                return {
+                    message: "User deleted successfully"
+                };
+            }
+            else{
+                return {
+                    message: "Failed to delete user"
+                };
+            }
+        }
+        catch (error) {
+            return {
+                message: error.message
+            };
         }
     }
 }
