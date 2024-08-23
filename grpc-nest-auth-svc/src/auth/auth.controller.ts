@@ -1,9 +1,9 @@
-import {Body, Controller, Inject} from '@nestjs/common';
-import {AuthService} from "./service/auth.service";
-import {GrpcMethod} from "@nestjs/microservices";
-import {AUTH_SERVICE_NAME, LoginResponse, RegisterResponse, ValidateResponse} from "./auth.pb";
-import {Observable, of} from "rxjs";
-import {LoginRequestDto, RegisterRequestDto, ValidateRequestDto} from "./auth.dto";
+import { Body, Controller, Inject } from '@nestjs/common';
+import { GrpcMethod } from "@nestjs/microservices";
+import { Observable, of } from "rxjs";
+import { LoginRequestDto, RegisterRequestDto, ValidateRequestDto } from "./auth.dto";
+import { AUTH_SERVICE_NAME, DeleteRequest, DeleteResponse, LoginResponse, RegisterResponse, ValidateResponse } from "./auth.pb";
+import { AuthService } from "./service/auth.service";
 
 @Controller()
 export class AuthController {
@@ -29,5 +29,15 @@ export class AuthController {
         @Body() payload: ValidateRequestDto)
         : Promise<Observable<ValidateResponse>> {
         return of(await this.service.validateToken(payload));
+    }
+
+    @GrpcMethod(AUTH_SERVICE_NAME, 'Delete')
+    @GrpcMethod(AUTH_SERVICE_NAME, 'Delete')
+    @GrpcMethod(AUTH_SERVICE_NAME, 'Delete')
+    private async delete(
+        @Body() payload: DeleteRequest)
+        : Promise<Observable<DeleteResponse>> {
+        const response = await this.service.deleteAuth(payload);
+        return of(response);
     }
 }

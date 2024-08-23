@@ -55,7 +55,7 @@ export class UserController implements OnModuleInit {
             };
 
             const response = await this.svc.updateUser(fullRequest);
-            
+
             return response;
         }
         catch (error) {
@@ -90,10 +90,15 @@ export class UserController implements OnModuleInit {
         }
     }
 
-    @Delete(':id')
-    async deleteUser(@Param('id') id: number): Promise<Observable<DeleteUserResponse>> {
+    @Delete('/delete')
+    @UseGuards(AuthGuard)
+    async deleteUser(
+        @Req() req,
+    ): Promise<Observable<DeleteUserResponse>> {
         try{
-            const request: DeleteUserRequest = {id: id};
+            const userId = req.user.id;
+
+            const request: DeleteUserRequest = {id: userId};
             const response = await this.svc.deleteUser(request);
             return response;
         }
