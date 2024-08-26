@@ -20,12 +20,13 @@ import { RoleGuard } from 'src/auth/role.guard';
 import { Roles } from 'src/config/role.decorator';
 import { CreatePostRequest, CreatePostResponse, DeletePostRequest, DeletePostResponse, GetAllPostsResponse, GetDetailPostRequest, GetDetailPostResponse, POST_SERVICE_NAME, PostServiceClient, UpdatePostRequest, UpdatePostResponse } from './post.pb';
 import {Public} from "../config/public.decorator";
-import {ApiBody, ApiOperation, ApiResponse, ApiTags} from "@nestjs/swagger";
+import {ApiBearerAuth, ApiBody, ApiOperation, ApiResponse, ApiTags} from "@nestjs/swagger";
 
 @ApiTags('Post')
 @Controller('post')
 @UseGuards(AuthGuard, RoleGuard)
 @Roles(1)
+@ApiBearerAuth()
 export class PostController implements OnModuleInit {
     private svc: PostServiceClient;
 
@@ -52,6 +53,7 @@ export class PostController implements OnModuleInit {
     }
 
     @Post()
+    @ApiBearerAuth()
     @ApiOperation({ summary: 'Create a new post' })
     @ApiBody({ type: CreatePostRequest })
     @ApiResponse({ status: 201, description: 'Post created successfully' })
@@ -69,6 +71,7 @@ export class PostController implements OnModuleInit {
     }
 
     @Get(':id')
+    @ApiBearerAuth()
     @ApiOperation({ summary: 'Get details of a specific post' })
     @ApiResponse({ status: 200, description: 'Successful response' })
     @ApiResponse({ status: 404, description: 'Post not found' })
@@ -91,6 +94,7 @@ export class PostController implements OnModuleInit {
 
     //Update Post
     @Patch(':id')
+    @ApiBearerAuth()
     @ApiOperation({ summary: 'Update a post' })
     @ApiBody({ type: UpdatePostRequest })
     @ApiResponse({ status: 200, description: 'Post updated successfully' })
@@ -112,6 +116,7 @@ export class PostController implements OnModuleInit {
 
     //Delete Post
     @Delete(':id')
+    @ApiBearerAuth()
     @ApiOperation({ summary: 'Delete a post' })
     @ApiResponse({ status: 200, description: 'Post deleted successfully' })
     @ApiResponse({ status: 500, description: 'Failed to delete post' })
