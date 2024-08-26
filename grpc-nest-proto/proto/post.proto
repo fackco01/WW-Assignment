@@ -15,25 +15,25 @@ message Post {
   string title = 2;
   string content = 3;
   string author = 4;
-  int64 created_at = 5;
-  int64 updated_at = 6;
+  string created_at = 5;
+  string updated_at = 6;
 }
 
 // CreatePost
 
 message CreatePostRequest{
-    int32 id = 1;
-    string title = 2;
-    string content = 3;
-    string author = 4;
-    string create_at = 5;
-    string update_at = 6;
+    string title = 1;
+    string content = 2;
+    string author = 3;
+    string create_at = 4;
+    string update_at = 5;
 }
 
 message CreatePostResponse {
     int32 id = 1;
     string message = 2;
-    Post post = 3;
+    string created_at = 3;
+    int32 status = 4;
 }
 
 // UpdatePost
@@ -66,9 +66,7 @@ message GetDetailPostRequest {
 }
 
 message GetDetailPostResponse {
-    int32 id = 1;
-    string message = 2;
-    Post post = 3;
+    Post post = 1;
 }
 
 //DeletePosts

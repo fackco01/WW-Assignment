@@ -7,6 +7,7 @@
 /* eslint-disable */
 import { GrpcMethod, GrpcStreamMethod } from "@nestjs/microservices";
 import { Observable } from "rxjs";
+import {ApiProperty} from "@nestjs/swagger";
 
 export const protobufPackage = "user";
 
@@ -20,11 +21,15 @@ export interface User {
 }
 
 /** CreateUser */
-export interface CreateUserRequest {
+export class CreateUserRequest {
   id: number;
+  @ApiProperty()
   username: string;
+  @ApiProperty()
   password: string;
+  @ApiProperty()
   fullName: string;
+  @ApiProperty()
   roleId: number;
 }
 
@@ -35,9 +40,11 @@ export interface CreateUserResponse {
 }
 
 /** UpdateUser */
-export interface UpdateUserRequest {
+export class UpdateUserRequest {
   id: number;
+  @ApiProperty()
   fullName: string;
+  @ApiProperty()
   roleId: number;
 }
 

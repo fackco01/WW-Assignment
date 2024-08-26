@@ -7,13 +7,18 @@
 /* eslint-disable */
 import { GrpcMethod, GrpcStreamMethod } from "@nestjs/microservices";
 import { Observable } from "rxjs";
+import {ApiProperty} from "@nestjs/swagger";
 
 export const protobufPackage = "auth";
 
-export interface RegisterRequest {
+export class RegisterRequest {
+  @ApiProperty()
   username: string;
+  @ApiProperty()
   password: string;
+  @ApiProperty()
   name: string;
+  @ApiProperty()
   roleId: number;
 }
 
@@ -23,8 +28,10 @@ export interface RegisterResponse {
   id: number;
 }
 
-export interface LoginRequest {
+export class LoginRequest {
+  @ApiProperty()
   username: string;
+  @ApiProperty()
   password: string;
 }
 
@@ -42,6 +49,7 @@ export interface ValidateResponse {
   status: number;
   error: string[];
   userId: number;
+  roleId: number;
 }
 
 /** Delete */
