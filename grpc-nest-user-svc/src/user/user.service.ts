@@ -17,8 +17,7 @@ export class UserService implements OnModuleInit {
 
     @InjectRepository(User)
     private readonly repository: Repository<User>;
-    constructor() {
-    }
+    constructor() {}
 
     onModuleInit() {
         this.authService = this.authClient.getService<AuthServiceClient>(AUTH_SERVICE_NAME);

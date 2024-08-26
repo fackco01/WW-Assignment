@@ -98,7 +98,8 @@ export class AuthService implements OnModuleInit {
             return {
                 status: HttpStatus.FORBIDDEN,
                 error: ['Invalid token'],
-                userId: null
+                userId: null,
+                roleId: null
             }
         }
 
@@ -108,14 +109,16 @@ export class AuthService implements OnModuleInit {
             return {
                 status: HttpStatus.FORBIDDEN,
                 error: ['User not found'],
-                userId: null
+                userId: null,
+                roleId: null
             }
         }
 
         return {
             status: HttpStatus.OK,
             error: null,
-            userId: decoded.id
+            userId: decoded.id,
+            roleId: decoded.roleId
         }
     }
 
