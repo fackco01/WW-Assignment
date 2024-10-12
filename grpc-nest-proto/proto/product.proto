@@ -1,0 +1,99 @@
+syntax = "proto3";
+
+package product;
+
+service ProductService {
+    rpc CreateProduct (CreateProductRequest) returns (CreateProductResponse) {}
+    rpc FindOneProduct (FindOneProductRequest) returns (FindOneProductResponse) {}
+    rpc UpdateProduct (UpdateProductRequest) returns (UpdateProductResponse) {}
+    rpc GetAllProducts (GetAllProductsRequest) returns (GetAllProductsResponse) {}
+    rpc GetDetailProduct (GetDetailProductRequest) returns (GetDetailProductResponse) {}
+    rpc DeleteProduct (DeleteProductRequest) returns (DeleteProductResponse) {}
+}
+
+// CreateProduct
+
+message CreateProductRequest {
+    string name = 1;            // Tên sản phẩm
+    string description = 2;     // Mô tả sản phẩm
+    double price = 3;           // Giá sản phẩm
+    int32 quantity = 4;         // Số lượng sản phẩm
+    int32 category_id = 5;      // Mã danh mục sản phẩm
+    string created_at = 6;      // Thời gian tạo
+    string updated_at = 7;      // Thời gian cập nhật
+}
+
+message CreateProductResponse {
+    int32 id = 1;               // ID của sản phẩm vừa tạo
+    string message = 2;         // Thông báo
+    string created_at = 3;      // Thời gian tạo
+    int32 status = 4;           // Trạng thái phản hồi (ví dụ: thành công hoặc thất bại)
+}
+
+// Find One Product
+
+message FindOneProductRequest {
+    int32 id = 1;               // Tìm sản phẩm theo ID
+}
+
+message FindOneProductResponse {
+    Product product = 1;        // Thông tin sản phẩm
+}
+
+// UpdateProduct
+
+message UpdateProductRequest {
+    int32 id = 1;               // ID sản phẩm cần cập nhật
+    string name = 2;            // Tên mới (nếu cần cập nhật)
+    string description = 3;     // Mô tả mới
+    double price = 4;           // Giá mới
+    int32 quantity = 5;         // Số lượng mới
+    int32 category_id = 6;      // Danh mục mới
+    string updated_at = 7;      // Thời gian cập nhật
+}
+
+message UpdateProductResponse {
+    string message = 1;         // Thông báo phản hồi
+}
+
+// GetAllProducts
+
+message GetAllProductsRequest {
+}
+
+message GetAllProductsResponse {
+    repeated Product products = 1;  // Danh sách sản phẩm
+}
+
+// GetDetailProduct
+
+message GetDetailProductRequest {
+    int32 id = 1;               // ID sản phẩm cần xem chi tiết
+}
+
+message GetDetailProductResponse {
+    Product product = 1;        // Thông tin chi tiết của sản phẩm
+}
+
+// DeleteProduct
+
+message DeleteProductRequest {
+    int32 id = 1;               // ID của sản phẩm cần xóa
+}
+
+message DeleteProductResponse {
+    string message = 1;         // Thông báo phản hồi
+}
+
+// Định nghĩa sản phẩm (Product)
+
+message Product {
+    int32 id = 1;               // ID sản phẩm
+    string name = 2;            // Tên sản phẩm
+    string description = 3;     // Mô tả sản phẩm
+    double price = 4;           // Giá sản phẩm
+    int32 quantity = 5;         // Số lượng sản phẩm
+    int32 category_id = 6;      // Mã danh mục
+    string created_at = 7;      // Thời gian tạo
+    string updated_at = 8;      // Thời gian cập nhật
+}
